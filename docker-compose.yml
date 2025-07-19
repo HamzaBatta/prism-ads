@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+    app:
+        build: .
+        container_name: ad
+        ports:
+            - "8001:8001"
+        volumes:
+            - ./:/var/www
+        environment:
+            - DB_HOST=db
+            - DB_DATABASE=${DB_DATABASE}
+            - DB_USERNAME=${DB_USERNAME}
+            - DB_PASSWORD=${DB_PASSWORD}
+        command: php artisan serve --host=0.0.0.0 --port=8001
+        depends_on:
+            - db
+
+    db:
+        image: mysql:8.0
+        container_name: db
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - mysql_data:/var/lib/mysql
+        ports:
+            - "3000:3306"
+        restart: unless-stopped
+
+volumes:
+    mysql_data:
