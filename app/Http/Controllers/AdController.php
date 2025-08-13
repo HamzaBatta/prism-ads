@@ -8,16 +8,32 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AdController extends Controller
 {
-    public function store(Request $request)
-    {
-        try {
-            $payload = JWTAuth::parseToken()->getPayload();
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
 
+    public function index()
+    {
+        $token = session('jwt_token');
+        $payload = JWTAuth::setToken($token)->getPayload();
         $userId = $payload->get('sub');
 
+        $ads = Ad::where('user_id', $userId)->with('media')->get();
+
+        // Add full URL for each media
+        $ads->map(function ($ad) {
+            $ad->media->map(function ($media) {
+                $media->url = url("storage/{$media->path}");
+                return $media;
+            });
+            return $ad;
+        });
+
+        return view('ads.index', compact('ads'));
+    }
+
+    public function store(Request $request)
+    {
+        $token = session('jwt_token');
+        $payload = JWTAuth::setToken($token)->getPayload();
+        $userId = $payload->get('sub');
 
         $request->validate([
             'text' => 'required|string',
@@ -32,44 +48,68 @@ class AdController extends Controller
             'user_id' => $userId,
         ]);
 
-        $mediaFiles = $request->file('media', []);
-        foreach ((array) $mediaFiles as $file) {
-            try {
-                $path = $file->store('posts', 'public');
+        if ($request->hasFile('media')) {
+            foreach ($request->file('media') as $file) {
+                $path = $file->store('ads', 'public');
                 $type = str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image';
-                $media = $ad->media()->create([
+                $ad->media()->create([
                     'path' => $path,
                     'type' => $type,
                 ]);
-            } catch (\Exception $e) {
-                $ad->delete();
-                $ad->media()->delete();
-                return response()->json([
-                    'message' => 'Post not created'
-                ], 400);
             }
         }
 
-
-
-        return response()->json([
-            'message' => 'Ad created',
-            'ad' => [
-                'id' => $ad->id,
-                'text' => $ad->text,
-                'remaining_users' => $ad->remaining_users,
-                'created_at' => $ad->created_at,
-                'media' => $ad->media->map(function ($media) {
-                    return [
-                        'id' => $media->id,
-                        'type' => $media->type,
-                        'url' => url("storage/{$media->path}"),
-                    ];
-                }),
-            ],
-
-        ], 201);
+        return redirect()->route('ads.index');
     }
+
+    public function destroy($id)
+    {
+        $token = session('jwt_token');
+        $payload = JWTAuth::setToken($token)->getPayload();
+        $userId = $payload->get('sub');
+
+        $ad = Ad::where('user_id', $userId)->findOrFail($id);
+        $ad->media()->delete();
+        $ad->delete();
+
+        return redirect()->route('ads.index');
+    }
+
+    //    public function update(Request $request, $id)
+    //    {
+    //        try {
+    //            $payload = JWTAuth::parseToken()->getPayload();
+    //        } catch (\Exception $e) {
+    //            return response()->json(['message' => 'Unauthorized'], 401);
+    //        }
+    //
+    //        $userId = $payload->get('sub');
+    //        $ad = Ad::where('user_id', $userId)->findOrFail($id);
+    //
+    //        $request->validate([
+    //            'text' => 'sometimes|required|string',
+    //            'remaining_users' => 'sometimes|required|integer|min:1',
+    //            'media' => 'nullable|array',
+    //            'media.*' => 'file|mimes:jpeg,png,gif,mp4,mov|max:20480',
+    //        ]);
+    //
+    //        $ad->update($request->only('text', 'remaining_users'));
+    //
+    //        if ($request->hasFile('media')) {
+    //            $ad->media()->delete();
+    //            foreach ($request->file('media') as $file) {
+    //                $path = $file->store('posts', 'public');
+    //                $type = str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image';
+    //                $ad->media()->create([
+    //                    'path' => $path,
+    //                    'type' => $type,
+    //                ]);
+    //            }
+    //        }
+    //
+    //        return response()->json(['message' => 'Ad updated', 'ad' => $ad->load('media')]);
+
+    //    }
 
     public function decrementRemainingUsers($id)
     {
