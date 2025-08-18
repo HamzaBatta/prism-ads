@@ -5,8 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Ads</title>
     @vite('resources/css/app.css')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleBtn = document.getElementById('toggleCreateAd');
+            const createAdSection = document.getElementById('createAdSection');
+
+            toggleBtn.addEventListener('click', function () {
+                createAdSection.classList.toggle('hidden');
+            });
+        });
+    </script>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-900 text-gray-100 min-h-screen">
 <div class="max-w-5xl mx-auto py-8 px-4">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Welcome, {{ session('user')['name'] }}</h1>
@@ -16,19 +26,27 @@
         </form>
     </div>
 
+    {{-- Toggle Button for Create Ad --}}
+    <div class="mb-6 text-center">
+        <button id="toggleCreateAd"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+            Create New Ad
+        </button>
+    </div>
+
     {{-- Create Ad --}}
-    <div class="bg-white p-6 rounded-lg shadow mb-8 max-w-lg mx-auto">
+    <div id="createAdSection" class="bg-gray-800 p-6 rounded-lg shadow mb-8 max-w-lg mx-auto hidden">
         <h2 class="text-xl font-semibold mb-4">Create Ad</h2>
         <form method="POST" action="{{ route('ads.store') }}" enctype="multipart/form-data" class="space-y-4">
             @csrf
             <input type="text" name="text" placeholder="Ad text" required
-                   class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                   class="w-full border border-gray-600 bg-gray-700 text-gray-200 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500">
 
             <input type="number" name="remaining_users" placeholder="Remaining users" required min="1"
-                   class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                   class="w-full border border-gray-600 bg-gray-700 text-gray-200 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500">
 
             <input type="file" name="media[]" multiple
-                   class="w-full border border-gray-300 rounded px-3 py-2">
+                   class="w-full border border-gray-600 bg-gray-700 text-gray-200 rounded px-3 py-2">
 
             <button type="submit"
                     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
@@ -41,10 +59,10 @@
     <h2 class="text-2xl font-semibold mb-4">My Ads</h2>
     <div class="grid gap-6 md:grid-cols-2">
         @foreach($ads as $ad)
-            <div class="bg-white p-4 rounded-lg shadow">
+            <div class="bg-gray-800 p-4 rounded-lg shadow">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-bold">{{ $ad->text }}</h3>
-                    <span class="text-gray-500 text-sm">Remaining: {{ $ad->remaining_users }}</span>
+                    <span class="text-gray-400 text-sm">Remaining: {{ $ad->remaining_users }}</span>
                 </div>
 
                 @if($ad->media && $ad->media->count())

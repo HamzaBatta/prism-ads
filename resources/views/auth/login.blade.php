@@ -6,29 +6,39 @@
     <title>Login</title>
     @vite('resources/css/app.css') {{-- Tailwind build --}}
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-<div class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-    <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen text-gray-100">
+
+<div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-sm border border-gray-700">
+    <h2 class="text-2xl font-bold mb-6 text-center text-white">Login</h2>
 
     @if($errors->any())
-        <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+        <div class="bg-red-900 text-red-200 p-3 rounded mb-4 border border-red-700">
             {{ $errors->first() }}
         </div>
     @endif
 
     <form method="POST" action="{{ route('login.post') }}" class="space-y-4">
         @csrf
-        <input type="email" name="email" placeholder="Email" autocomplete="email" required
-               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="email"
+               name="email"
+               placeholder="Email"
+               autocomplete="email"
+               required
+               class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
 
-        <input type="password" name="password" placeholder="Password" autocomplete="current-password" required
-               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="password"
+               name="password"
+               placeholder="Password"
+               autocomplete="current-password"
+               required
+               class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
 
         <button type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200">
+                class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-500 transition duration-200">
             Login
         </button>
     </form>
 </div>
+
 </body>
 </html>
