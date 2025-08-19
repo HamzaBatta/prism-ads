@@ -75,41 +75,6 @@ class AdController extends Controller
         return redirect()->route('ads.index');
     }
 
-    //    public function update(Request $request, $id)
-    //    {
-    //        try {
-    //            $payload = JWTAuth::parseToken()->getPayload();
-    //        } catch (\Exception $e) {
-    //            return response()->json(['message' => 'Unauthorized'], 401);
-    //        }
-    //
-    //        $userId = $payload->get('sub');
-    //        $ad = Ad::where('user_id', $userId)->findOrFail($id);
-    //
-    //        $request->validate([
-    //            'text' => 'sometimes|required|string',
-    //            'remaining_users' => 'sometimes|required|integer|min:1',
-    //            'media' => 'nullable|array',
-    //            'media.*' => 'file|mimes:jpeg,png,gif,mp4,mov|max:20480',
-    //        ]);
-    //
-    //        $ad->update($request->only('text', 'remaining_users'));
-    //
-    //        if ($request->hasFile('media')) {
-    //            $ad->media()->delete();
-    //            foreach ($request->file('media') as $file) {
-    //                $path = $file->store('posts', 'public');
-    //                $type = str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image';
-    //                $ad->media()->create([
-    //                    'path' => $path,
-    //                    'type' => $type,
-    //                ]);
-    //            }
-    //        }
-    //
-    //        return response()->json(['message' => 'Ad updated', 'ad' => $ad->load('media')]);
-
-    //    }
 
     public function decrementRemainingUsers($id)
     {
