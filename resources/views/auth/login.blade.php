@@ -9,7 +9,7 @@
 <body class="bg-gray-900 flex items-center justify-center min-h-screen text-gray-100">
 
 <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-sm border border-gray-700">
-    <h2 class="text-2xl font-bold mb-6 text-center text-white">Login</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center text-white">Login To Prism Ads</h2>
 
     @if($errors->any())
         <div class="bg-red-900 text-red-200 p-3 rounded mb-4 border border-red-700">
