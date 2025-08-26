@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Ad;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Services\EventPublisher;
+
+
 
 class AdController extends Controller
 {
@@ -58,7 +61,21 @@ class AdController extends Controller
                 ]);
             }
         }
-
+        // --- sending the ADCreated event ---
+        app(EventPublisher::class)->publishEvent('ADCreated',[
+                'id' => $ad->id,
+                'text' => $ad->text,
+                'media' => $ad->media->map(function ($media) {
+                    return [
+                        'id' => $media->id,
+                        'type' => $media->type,
+                        'url' => url("storage/{$media->path}"),
+                    ];
+                }),
+                'created_at' => $ad->created_at,
+                'user_id' => $ad->user_id,
+                'remaining_users' => $ad->remaining_users
+        ]);
         return redirect()->route('ads.index');
     }
 
@@ -69,6 +86,10 @@ class AdController extends Controller
         $userId = $payload->get('sub');
 
         $ad = Ad::where('user_id', $userId)->findOrFail($id);
+        // --- sending the ADDeleted event ---
+        app(EventPublisher::class)->publishEvent('ADDeleted',[
+                'id' => $ad->id,
+        ]);
         $ad->media()->delete();
         $ad->delete();
 
