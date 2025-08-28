@@ -102,7 +102,8 @@ class AdController extends Controller
         $ad = Ad::findOrFail($id);
         if ($ad->remaining_users > 0) {
             $ad->decrement('remaining_users');
+            return response()->json(['message' =>'keep going']);
         }
-        return response()->json(['remaining_users' => $ad->remaining_users]);
+        return response()->json(['message' => "finished this ad"]);
     }
 }
